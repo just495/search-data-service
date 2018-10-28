@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Сервис поиска данных в тексте</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Сервис поиска данных в тексте</a>
+    </nav>
+    <div class="container-fluid" style="padding-top: 50px;">
+        <div class="row">
+            <div class="col col-sm-12 col-md-4">
+                <form id='parserTextForm'>
+                    <div class="form-group">
+                        <label>Произвольный текст</label>
+                        <textarea class="form-control" name="text" rows="10"></textarea>
+                    </div>
+                    <button class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+            <div class="col col-sm-12 col-md-8">
+                Результат
+                <pre><p id='result' style="white-space: pre-wrap">
+                    Нет данных
+                </p></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script>
+        $('#parserTextForm').submit(function(event){
+            event.preventDefault();
+            text = $(this).find('[name=text]')[0].value
+            $('#result').text('Идет обработка...');
+            $.post( "/parser", { text: text } ).done(function(data){
+                $('#result').text(JSON.stringify(data, null, 2))
+            });
+        })
+    </script>
+</body>
+</html>
