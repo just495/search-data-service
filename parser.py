@@ -56,8 +56,8 @@ class ParserPlaceName(ParserBase):
                 # разбиваем части предложения на слова
                 words = re.split('[ ]', part)
                 for key, word in enumerate(words):
-                    # проспускаем слов, если+ оно не начинается с верхнего регистра
-                    if not re.match('(^[А-Я]{1})', word):
+                    # проспускаем слово, если оно не начинается с верхнего регистра или длина слова равна 1
+                    if not re.match('(^[А-Я]{1})', word) or len(word) == 1:
                         continue
                     # пытаемся геокодировать срез части предложений
                     geocoded = self.geocode(words[key:])
@@ -110,6 +110,8 @@ class ParserPersonName(ParserBase):
                 for key, word in enumerate(words):
                     names = []
                     while re.match('(^[А-Я]{1})', word):
+                        if len(word) == 1:
+                            break
                         if self.is_given_name(word):
                             names.append(word)
                             del words[key]
