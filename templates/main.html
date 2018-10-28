@@ -23,10 +23,15 @@
                 </form>
             </div>
             <div class="col col-sm-12 col-md-8">
-                Результат
-                <pre><p id='result' style="white-space: pre-wrap">
+                Результат  <a data-toggle="collapse" href="#collapseResultJson" role="button" aria-expanded="false" aria-controls="collapseResultJson">json</a>
+                <pre class="collapse" id="collapseResultJson"><p id='result-json' style="white-space: pre-wrap">
                     Нет данных
                 </p></pre>
+                <pre>
+                <p id='result-html' style="white-space: pre-wrap">
+                    Нет данных
+                </p>
+                </pre>
             </div>
         </div>
     </div>
@@ -37,10 +42,22 @@
     <script>
         $('#parserTextForm').submit(function(event){
             event.preventDefault();
-            text = $(this).find('[name=text]')[0].value
-            $('#result').text('Идет обработка...');
+            let text = $(this).find('[name=text]')[0].value
+            $('#result-json').text('Идет обработка...');
+            $('#result-html').text('Идет обработка...');
             $.post( "/parser", { text: text } ).done(function(data){
-                $('#result').text(JSON.stringify(data, null, 2))
+                $('#result-json').text(JSON.stringify(data, null, 2));
+                let preview = data.source;
+                let unique = data.result.map(function (item) {
+                    return item.text
+                }).filter(function (value, index, self) {
+                    return self.indexOf(value) === index;
+                });
+                unique.forEach(function (value) {
+                    let re = new RegExp(value+"(?![а-я]{1})","g");
+                    preview = preview.replace(re, "<span style='background-color: yellow;'>"+value+"</span>");
+                });
+                $('#result-html').html(preview);
             });
         })
     </script>
