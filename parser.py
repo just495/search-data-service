@@ -137,26 +137,41 @@ class ParserPersonName(ParserBase):
 
 
 class ParserMoney(ParserBase):
-    currencies = [{
+    _currencies = [{
         "short": 'USD',
-        "symbol": '$'
+        "symbol": '$',
+        "regex": []
     }, {
         "short": "EUR",
-        "symbol": '€'
+        "symbol": '€',
+        "regex": []
     }, {
         "short": "RUB",
-        "symbol": '₽'
+        "symbol": '₽',
+        "regex": ['\d+ рубл[ьяей]{1,2} \d+ копе[ей]{1}к[а]{0,1}',
+                  '\d+ рубл[ьяей]{1,2}',
+                  '\d+ копе[ей]{1}к[а]{0,1}']
     }]
 
     def parse(self, text):
+        # TODO необходим рефакторинг
         result = []
         regex = r'\d+[ ]{0,1}'
-        regex += '(?:(?:[{symbols}])|(?:{shorts}))'.format(symbols='|'.join([cur['symbol'] for cur in self.currencies]),
-                                                           shorts='|'.join([cur['short'] for cur in self.currencies]))
+        regex += '(?:(?:[{symbols}])|(?:{shorts}))'.format(symbols='|'.join([cur['symbol'] for cur in self._currencies]),
+                                                           shorts='|'.join([cur['short'] for cur in self._currencies]))
         matches = re.finditer(regex, text, re.MULTILINE)
 
         for match in matches:
+            text = text.replace(match.group(0), '')
             result.append({'text': match.group(0), 'type': 'money'})
+
+        for currency in self._currencies:
+            for regex in currency['regex']:
+                matches = re.finditer(regex, text, re.MULTILINE)
+
+                for match in matches:
+                    text = text.replace(match.group(0), '')
+                    result.append({'text': match.group(0), 'type': 'money'})
 
         return result
 
